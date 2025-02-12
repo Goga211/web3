@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:h="http://xmlns.jcp.org/jsf/html"
+       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+       xmlns:f="http://xmlns.jcp.org/jsf/core"
+       xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Лабораторная работа 3</title>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script src="js/main.js"></script>
+</h:head>
+
+<h:body>
+    <header>Антипин Григорий Викторович, P3232, вариант 54643</header>
+
+    <!-- Контейнер для графика и формы -->
+    <div id="graph-and-form">
+        <div id="coordinate-plate">
+            <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg" id="plate">
+                <!-- Треугольник в 1 четверти (от R до R по X и Y) -->
+                <polygon id="triangle" points="250,250 250,150 350,250" fill="rgba(173, 216, 230, 1)"></polygon>
+
+                <!-- Прямоугольник во 2 четверти (до R/2 по Y и до -R по X) -->
+                <rect id="rect" x="150" y="200" width="100" height="50" fill="rgba(173, 216, 230, 1)"></rect>
+
+                <path id="arc" d="M 150 250 A 100 100 0 0 0 251 350 L 251 251 Z" fill="rgba(173, 216, 230, 1)"/>
+
+                <!-- Подписи осей -->
+                <text x="260" y="50" id="text-y" fill="black">Y</text>
+                <text x="450" y="240" id="text-x" fill="black">X</text>
+
+                <!-- Ось X -->
+                <line id="axis-x" x1="50" y1="250" x2="450" y2="250" stroke="black" stroke-width="2"></line>
+                <!-- Ось Y -->
+                <line id="axis-y" x1="250" y1="50" x2="250" y2="450" stroke="black" stroke-width="2"></line>
+
+                <!-- Стрелки -->
+                <polygon id="arrow-x" points="450,245 450,255 460,250" fill="black"></polygon>
+                <polygon id="arrow-y" points="245,50 255,50 250,40" fill="black"></polygon>
+
+                <!-- Метки радиуса -->
+                <line id="mark-neg-rx" x1="150" y1="245" x2="150" y2="255" stroke="black" stroke-width="2"></line>
+                <line id="mark-neg-ry" x1="245" y1="350" x2="255" y2="350" stroke="black" stroke-width="2"></line>
+                <text x="130" y="245" id="label-neg-rx" class="small" fill="black">-R</text>
+                <text x="260" y="360" id="label-neg-ry" class="small" fill="black">-R</text>
+                <line id="mark-rx" x1="350" y1="245" x2="350" y2="255" stroke="black" stroke-width="2"></line>
+                <line id="mark-ry" x1="245" y1="150" x2="255" y2="150" stroke="black" stroke-width="2"></line>
+                <text x="353" y="245" id="label-rx" class="small" fill="black">R</text>
+                <text x="260" y="154" id="label-ry" class="small" fill="black">R</text>
+
+                <!-- R/2 -->
+                <line id="mark-half-rx" x1="300" y1="245" x2="300" y2="255" stroke="black" stroke-width="2"></line>
+                <line id="mark-half-neg-rx" x1="200" y1="245" x2="200" y2="255" stroke="black" stroke-width="2"></line>
+                <line id="mark-half-ry" x1="245" y1="200" x2="255" y2="200" stroke="black" stroke-width="2"></line>
+                <line id="mark-half-neg-ry" x1="245" y1="300" x2="255" y2="300" stroke="black" stroke-width="2"></line>
+                <text x="310" y="245" id="label-half-rx" class="small" fill="black">R/2</text>
+                <text x="190" y="245" id="label-half-neg-rx" class="small" fill="black">-R/2</text>
+                <text x="260" y="310" id="label-half-neg-ry" class="small" fill="black">-R/2</text>
+                <text x="260" y="205" id="label-half-ry" class="small" fill="black">R/2</text>
+            </svg>
+            <div id="data">
+                <ui:repeat value="#{controllerBean.getResultList()}" var="result">
+                    <span class="point" data-x="#{result.x}" data-y="#{result.y}" data-r="#{result.r}"
+                          data-result="#{result.result}"></span>
+                </ui:repeat>
+            </div>
+        </div>
+
+        <!-- Форма ввода данных -->
+        <div id="input">
+            <div id="error" hidden="hidden"></div>
+            <h:form id="data-form">
+                <h:panelGrid columns="1" id="legend-x">
+                    <h:outputLabel for="slider" value="Выберите значение X:"/>
+                    <h:inputText id="x" value="#{controllerBean.x}" style="width: 50px;">
+                        <f:validateDoubleRange minimum="-4" maximum="4"/>
+                    </h:inputText>
+
+                    <!-- Слайдер -->
+                    <p:slider id="slider"
+                              value="#{controllerBean.x}"
+                              minValue="-4"
+                              maxValue="4"
+                              step="1"
+                              for="x" />
+                </h:panelGrid>
+
+                <!-- Ввод Y -->
+                <h:panelGrid columns="1" id="legend-y">
+                    <h:outputLabel for="y" value="Введите Y (от -5 до 5):"/>
+                    <h:inputText id="y" value="#{controllerBean.y}" required="true">
+                        <f:validateDoubleRange minimum="-5" maximum="5"/>
+                    </h:inputText>
+                </h:panelGrid>
+
+                <!-- Выбор радиуса -->
+                <h:panelGrid columns="1" id="legend-r">
+                    <h:panelGroup>
+                        <h:outputLabel for="r" value="Выберите радиус R:"/>
+                        <h:selectOneRadio id="r" value="#{controllerBean.r}" required="true">
+                            <f:selectItem itemValue="1" itemLabel="1"/>
+                            <f:selectItem itemValue="2" itemLabel="2"/>
+                            <f:selectItem itemValue="3" itemLabel="3"/>
+                            <f:selectItem itemValue="4" itemLabel="4"/>
+                            <f:selectItem itemValue="5" itemLabel="5"/>
+                        </h:selectOneRadio>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <!-- Кнопка отправки -->
+                <h:commandButton id="submit" value="Проверить" action="#{controllerBean.completeRequest()}"
+                                 onclick="return true;">
+                    <f:ajax execute="@form" render="coordinate-plate result-table"/>
+                </h:commandButton>
+            </h:form>
+        </div>
+    </div>
+
+    <h:form class="navigation">
+        <h:commandButton value="Начальная страница" action="index"/>
+    </h:form>
+
+    <div id="result">
+        <table id="result-table">
+            <tr>
+                <th id="result-x">X</th>
+                <th id="result-y">Y</th>
+                <th id="result-r">R</th>
+                <th id="result-time">Time</th>
+                <th id="result-now">Now</th>
+                <th id="result-answer">Result</th>
+            </tr>
+            <ui:repeat value="#{controllerBean.getResultList()}" var="result">
+                <tr>
+                    <td><h:outputText value="#{result.x}"/></td>
+                    <td><h:outputText value="#{result.y}"/></td>
+                    <td><h:outputText value="#{result.r}"/></td>
+                    <td><h:outputText value="#{result.executionTime} нс"/></td>
+                    <td><h:outputText value="#{result.currentTime}"/></td>
+                    <td><h:outputText value="#{result.result}"/></td>
+                </tr>
+            </ui:repeat>
+        </table>
+    </div>
+</h:body>
+</html>
